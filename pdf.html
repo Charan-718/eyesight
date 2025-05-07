@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vision-Aware Viewer Pro</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    input, button {
+      margin: 8px 5px;
+      padding: 8px;
+      font-size: 16px;
+    }
+
+    #pdfCanvas, #imageViewer {
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      display: none;
+      max-width: 100%;
+    }
+
+    #imageViewer {
+      transition: transform 0.3s ease, filter 0.3s ease;
+    }
+
+    .high-contrast {
+      background: #000;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Vision-Aware Viewer</h2>
+
+  <input type="file" id="fileUpload" accept=".pdf,image/*">
+  <input type="number" step="0.01" id="eyePowerInput" placeholder="Enter your eye power">
+  <button onclick="handleUpload()">View with Zoom</button>
+  <button onclick="toggleContrast()">Toggle Contrast</button>
+  <button onclick="speakText()">🔊 Speak</button>
+  <br>
+
+  <button onclick="prevPage()">⬅️ Previous</button>
+  <button onclick="nextPage()">Next ➡️</button>
+
+  <canvas id="pdfCanvas"></canvas>
+  <img id="imageViewer" alt="Uploaded Image Preview">
+
+  <script>
+    const canvas = document.getElementById('pdfCanvas');
+    const ctx = canvas.getContext('2d');
+    const imageViewer = document.getElementById('imageViewer');
+
+    let pdfDoc = null;
+    let currentPage = 1;
+    let zoom = 1;
+
+    // Load eye power from localStorage if exists
+    document.getElementById('eyePowerInput').value = localStorage.getItem('eyePower') || '';
+
+    function handleUpload() {
+      const file = document.getElementById('fileUpload').files[0];
+      const eyePower = parseFloat(document.getElementById('eyePowerInput').value);
+      if (!file) return alert("Please upload a file.");
+      if (isNaN(eyePower)) return alert("Enter valid eye power.");
+
+      localStorage.setItem('eyePower', eyePower); // Save to localStorage
+      zoom = 1 + Math.abs(eyePower) * 0.2;
+
+      // Reset views
+      canvas.style.display = "none";
+      imageViewer.style.display = "none";
+
+      if (file.type === "application/pdf") {
+        const reader = new FileReader();
+        reader.onload = function () {
+          const typedarray = new Uint8Array(this.result);
+          pdfjsLib.getDocument({ data: typedarray }).promise.then(pdf => {
+            pdfDoc = pdf;
+            currentPage = 1;
+            renderPDFPage(currentPage);
+          });
+        };
+        reader.readAsArrayBuffer(file);
+      } else if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = function () {
+          imageViewer.src = reader.result;
+          imageViewer.style.display = "block";
+          imageViewer.style.transform = `scale(${zoom})`;
+          imageViewer.style.filter = "blur(0)";
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function renderPDFPage(pageNum) {
+      pdfDoc.getPage(pageNum).then(page => {
+        const viewport = page.getViewport({ scale: zoom });
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        canvas.style.display = "block";
+
+        const renderContext = {
+          canvasContext: ctx,
+          viewport: viewport
+        };
+
+        page.render(renderContext);
+      });
+    }
+
+    function nextPage() {
+      if (pdfDoc && currentPage < pdfDoc.numPages) {
+        currentPage++;
+        renderPDFPage(currentPage);
+      }
+    }
+
+    function prevPage() {
+      if (pdfDoc && currentPage > 1) {
+        currentPage--;
+        renderPDFPage(currentPage);
+      }
+    }
+
+    function toggleContrast() {
+      document.body.classList.toggle("high-contrast");
+    }
+
+    function speakText() {
+      const synth = window.speechSynthesis;
+      let text = "";
+
+      if (pdfDoc) {
+        text = `Reading PDF page ${currentPage}`;
+      } else if (imageViewer.src) {
+        text = "Image uploaded and scaled for better vision.";
+      } else {
+        text = "No file is uploaded.";
+      }
+
+      const utter = new SpeechSynthesisUtterance(text);
+      synth.speak(utter);
+    }
+  </script>
+
+</body>
+</html>

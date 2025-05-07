@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Storage App</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <!-- FontAwesome for icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <!-- PDF.js library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+  
+  <link href="index.css" rel="stylesheet">
+  <link href="test.css" rel="stylesheet">
+
+  <style>
+    
+
+  </style>
+</head>
+<body>
+  <div>
+    <div class="bg-container p-5">
+      <div class="parent-container">
+        <div class="child-div child-one">
+          <!--Spects Img-->
+        </div>
+        <div class="child-div child-two row d-flex flex-row justify-content-between">
+          <div class="col-lg-5">
+            <h1 class="test-title">Online <br> Eye Sight Test</h1>
+            <button style="margin-left: 50px;" id="takeTestBtn">Take Test</button>
+          </div>
+          
+  
+          <div class="col-lg-5" id="eye-power-section" style="margin: 20px;">
+            <label class="eye-power-label" for="eyePower">Eye Power <br> (e.g., -2.5, +1.0):</label> <br>
+            <input type="number" id="eyePower" step="0.1" placeholder="e.g. -2.5, +1.75" /> <br>
+            <button class="adjust-sight-btn" onclick="eyeSight()">Adjust Sight</button>
+          </div>
+        </div>
+      </div>
+
+      <!--Test Modal -->
+      <div id="testModal" class="modal">
+        <div class="modal-content">
+          <span id="closeModal" class="close">&times;</span>
+          <h2 style="font-weight: bold;">What letter do you see?</h2>
+          <p id="testLetter" class="letter" style="color: #0f4c5c;"></p>
+          <input style="text-transform: uppercase;" type="text" id="userAnswer" placeholder="Enter the letter" maxlength="1">
+          <button id="submitAnswer">Submit</button>
+        </div>
+      </div>
+
+      <!-- <h1 class="mb-4 text-center">File Storage App</h1> -->
+      <div class="alert alert-warning storage-warning" id="storageWarning">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        <span id="warningMessage"></span>
+      </div>
+    
+      <div class="container">
+        <div class="row mb-4">
+          <!-- Eye Power Input Section -->
+          <!-- <div id="eye-power-section" style="margin: 20px;">
+              <label for="eyePower">Enter Eye Power (e.g., -2.5, +1.0):</label>
+              <input type="number" id="zoomPower" step="0.1" placeholder="e.g. -2.5" />
+              <button class="btn btn-secondary" onclick="applyZoom()">Apply Zoom</button>
+          </div> -->
+          <div class="col-md-4 mx-auto">
+            <div class="card choose-file-card">
+              <div class="card-body">
+                <!-- <p class="card-text text-muted mb-3">Upload PDFs and images to store in your browser</p> -->
+                
+                <div class="mb-3 choose-file">
+                  <label for="fileUpload" class="form-label"></label>
+                  <input class="form-control" type="file" id="fileUpload" accept=".pdf,.jpg,.jpeg,.png,.gif">
+                </div>
+                
+                <button class="btn btn-success w-100" id="uploadBtn">
+                  <i class="fas fa-upload me-2"></i>Upload File
+                </button>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      
+      <div id="result" class="result"></div>
+
+    </div>
+
+
+    <div class="container">
+      <h2 class="mb-3 your-files-title">Your Files</h2>
+      <div class="row" id="fileContainer">
+        <!-- Files will be displayed here -->
+      </div>
+    
+      <div class="no-files-message" id="noFilesMessage">
+        <div class="text-center text-muted">
+          <i class="fas fa-folder-open fa-3x mb-3"></i>
+          <h4>No files uploaded yet</h4>
+          <p>Upload PDFs and images to see them here</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  
+
+  <script type="module" src="./js/index.js"></script>
+  <script type="module" src="./js/zoomHandler.js"></script> 
+  <script type="module" src="./js/test.js"></script> 
+</body>
+</html>
